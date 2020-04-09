@@ -1,12 +1,11 @@
 /*
  * DCT_532.cpp
  *
- *  Created on: Jul 21, 2017
- *      Author: Rolando Valdez
+ *  
  */
 /*
  * DCT 532 I2C library
- * Created by Rolando Valdez, July 21, 2017
+ * 
  *
  */
 
