@@ -1,8 +1,6 @@
 /*
  * DCT_532.h
  *
- *  Created on: Jul 21, 2017
- *      Author: Rolando Valdez
  */
 
 
