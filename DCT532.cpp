@@ -174,10 +174,10 @@ float DCT532::bytesToFloat(uint8_t b0, uint8_t b1, uint8_t b2, uint8_t b3) {
     float f;
     uint8_t bytes[4];
   } u;
-  u.bytes[0] = b0; // LSB
-  u.bytes[1] = b1;
-  u.bytes[2] = b2;
-  u.bytes[3] = b3; // MSB (sign/exponent)
+  u.bytes[0] = b3; // MSB (sign/exponent) 
+  u.bytes[1] = b2;
+  u.bytes[2] = b1;
+  u.bytes[3] = b0; // LSB
   return u.f;
 }
 
