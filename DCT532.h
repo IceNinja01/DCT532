@@ -59,7 +59,8 @@ class DCT532 {
 	//Config helpers
 	bool setOutputType(bool integerMode);
 	bool setBigEndian(bool bigEndian);
-
+	int16_t readPressureInt16();
+	int16_t readTemperatureInt16();
     // Optional - for debug / advanced
     uint8_t readRegister(uint8_t reg);
     bool writeRegister(uint8_t reg, uint8_t value);
