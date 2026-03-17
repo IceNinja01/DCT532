@@ -23,7 +23,7 @@
 #define CONFIG 0x40
 #define SLAVEADDRESS 0x43
 #define PRESSUREUNIT 0x44
-#define TEMPERATUREUNIT 0x4E // often 0x4E or 0x4D - check your device
+#define TEMPERATUREUNIT 0x4D // often 0x4E or 0x4D - check your device
 
 /* Pressure unit codes (from datasheet examples - adjust if needed) */
 typedef enum {
