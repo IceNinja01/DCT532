@@ -52,7 +52,7 @@ class DCT532 {
     uint8_t getStatus();
     bool dataReady();
     void setPressureUnits(dct532_pressure_unit units);
-	void setPressureUnits(dct532_temperature_unit units);
+	void setTemperatureUnits(dct532_temperature_unit units);
     const char* getPressureUnits();
 	const char* getTemperatureUnits();
     float bytesToFloat(uint8_t b0, uint8_t b1, uint8_t b2, uint8_t b3); // little-endian default
