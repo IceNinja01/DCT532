@@ -46,7 +46,7 @@ bool DCT532::begin(uint8_t i2caddr) {
   }
 
   // Optional: reset config to defaults (float, little-endian, etc.)
-  //writeRegister(CONFIG, 0x00);
+  writeRegister(CONFIG, 0x00);
   setOutputType(false);  // 16-bit int
   setBigEndian(false);  // or true for big endian
   
