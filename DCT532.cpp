@@ -61,11 +61,11 @@ bool DCT532::begin(uint8_t i2caddr) {
     @brief Write 8-bit value to register
 */
 /**************************************************************************/
-void DCT532::writeRegister(uint8_t reg, uint8_t value) {
+bool DCT532::writeRegister(uint8_t reg, uint8_t value) {
   Wire.beginTransmission(_i2caddr);
   Wire.write(reg);
   Wire.write(value);
-  Wire.endTransmission();
+  return (Wire.endTransmission() == 0);
 }
 
 /**************************************************************************/
@@ -187,7 +187,8 @@ float DCT532::bytesToFloat(uint8_t b0, uint8_t b1, uint8_t b2, uint8_t b3) {
 */
 /**************************************************************************/
 void DCT532::setPressureUnits(dct532_pressure_unit units) {
-  writeRegister(PRESSUREUNIT, (uint8_t)units);
+  if(!writeRegister(PRESSUREUNIT, (uint8_t)units)){
+     Serial.println("NACK on pressure unit set!")};
   _pressureUnit = (uint8_t)units;
 }
 
@@ -198,7 +199,8 @@ void DCT532::setPressureUnits(dct532_pressure_unit units) {
 */
 /**************************************************************************/
 void DCT532::setTemperatureUnits(dct532_temperature_unit units) {
-  writeRegister(0x4D, (uint8_t)units);
+  if(!writeRegister(TEMPERATUREUNIT, (uint8_t)units)){
+     Serial.println("NACK on tmeperature unit set!")};
   _temperatureUnit = (uint8_t)units;  //cache 
 }
 
@@ -227,7 +229,7 @@ const char* DCT532::getPressureUnits() {
 /**************************************************************************/
 const char* DCT532::getTemperatureUnits() {
   if (_temperatureUnit == 0xFF) {	// 0xFF = uninitialized
-    _temperatureUnit = readRegister(0x4D);
+    _temperatureUnit = readRegister(TEMPERATUREUNIT);
   }
   switch (_temperatureUnit) {
     case 0x20: return "°C";
