@@ -56,6 +56,9 @@ class DCT532 {
     const char* getPressureUnits();
 	const char* getTemperatureUnits();
     float bytesToFloat(uint8_t b0, uint8_t b1, uint8_t b2, uint8_t b3); // little-endian default
+	//Config helpers
+	bool setOutputType(bool integerMode);
+	bool setBigEndian(bool bigEndian);
 
     // Optional - for debug / advanced
     uint8_t readRegister(uint8_t reg);
