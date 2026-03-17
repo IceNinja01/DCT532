@@ -19,7 +19,7 @@
 /* Registers */
 #define STATUS 0x00
 #define PRESSURE 0x01 // 4 bytes float (or 2 bytes int16)
-#define TEMPERATURE 0x03 // 4 bytes float (or 2 bytes int16)
+#define TEMPERATURE 0x05 // 4 bytes float (or 2 bytes int16)
 #define CONFIG 0x40
 #define SLAVEADDRESS 0x43
 #define PRESSUREUNIT 0x44
