@@ -1,9 +1,6 @@
 /*
- * DCT_532.h
- *
+ * DCT532.h - Library for BD|SENSORS DCT532 I²C pressure/temperature sensor
  */
-
-
 
 #ifndef DCT532_h
 #define DCT532_h
@@ -14,57 +11,60 @@
  #include "WProgram.h"
 #endif
 
+#include <Wire.h>
 
-#include "Wire.h"
+/* I2C ADDRESS */
+#define DCT532_DEFAULT_ADDRESS 0x28 // DEFAULT ON DATASHEET
 
-/*========================================================
-    I2C ADDRESS/BITS
-    ------------------------------------------------------*/
-    #define DCT532_DEFAULT_ADDRESS                 (0x32)
-/*========================================================*/
+/* Registers */
+#define STATUS 0x00
+#define PRESSURE 0x01 // 4 bytes float (or 2 bytes int16)
+#define TEMPERATURE 0x04 // 4 bytes float (or 2 bytes int16)
+#define CONFIG 0x40
+#define SLAVEADDRESS 0x43
+#define PRESSUREUNIT 0x44
+#define TEMPERATUREUNIT 0x4E // often 0x4E or 0x4D - check your device
 
+/* Pressure unit codes (from datasheet examples - adjust if needed) */
+typedef enum {
+  DCT532_PRESSURE_UNITS_PSI = 0x05, // PSI (common)
+  DCT532_PRESSURE_UNITS_BAR = 0x02, // bar
+  DCT532_PRESSURE_UNITS_MBAR = 0x06,
+  DCT532_PRESSURE_UNITS_KPA = 0x0A,
+  DCT532_PRESSURE_UNITS_ATM = 0x0F, // approx - verify
+  DCT532_PRESSURE_UNITS_PA = 0x0B
+} dct532_pressure_unit;
 
-//Registry address
-#define STATUS 			0X00
-#define PRESSURE		0x01 // 0x01 to 0x04
-#define CONFIG			0x40
-#define SLAVEADDRESS	0x43
-#define PRESSUREUNIT	0x44
+/* Temperature unit codes (from datasheet examples - adjust if needed) */
+typedef enum {
+	DCT532_TEMP_C		= 0X20,		// °C DEFAULT
+	DCT532_TEMP_F		= 0X21,		// °F
+	DCT532_TEMP_RANKINE	= 0X22,		// °R
+	DCT532TEMP_KELVIN	= 0X23,		// K
+} dct532_temperature_unit;
 
+class DCT532 {
+  public:
+    DCT532();
+    bool begin(uint8_t addr = DCT532_DEFAULT_ADDRESS);
+    float readPressure();
+    float readTemperature();
+    uint8_t getStatus();
+    bool dataReady();
+    void setPressureUnits(dct532_pressure_unit units);
+	void setPressureUnits(dct532_temperature_unit units);
+    const char* getPressureUnits();
+	const char* getTemperatureUnits();
+    float bytesToFloat(uint8_t b0, uint8_t b1, uint8_t b2, uint8_t b3); // little-endian default
 
+    // Optional - for debug / advanced
+    uint8_t readRegister(uint8_t reg);
+    bool writeRegister(uint8_t reg, uint8_t value);
 
-typedef enum
-{
-	DCT532_PRESSURE_UNITS_PSI		= 0x06,	//Default-Pounds per square inch
-	DCT532_PRESSURE_UNITS_BAR		= 0x07,	//Bar
-	DCT532_PRESSURE_UNITS_ATM		= 0x0E,	//Atmosphere
-	DCT532_PRESSURE_UNITS_PA		= 0x0B,	//Pascals
-
-}dct532_pressure_unit;
-
-
-
-
-class DCT532
-{
-	public:
-		DCT532();
-		bool begin(uint8_t addr = DCT532_DEFAULT_ADDRESS);
-		float bytesToFloat(uint8_t b3, uint8_t b2, uint8_t b1, uint8_t b0);
-		uint8_t readRegistery(uint8_t reg);
-		uint8_t* readRegistery(uint8_t reg, int byteNum);
-		void writeRegistery(uint8_t reg, uint8_t value);
-		void read();
-		void setPressureUnits(dct532_pressure_unit units);
-		char* getPressureUnits(void);
-		uint8_t arry[5]; //array for bytes
-		int32_t pres;
-		float pressure; //data from sensor
-		int status;		//status from sensor new reading (1) or old (0)
-	private:
-		int8_t  _i2caddr;
-		uint8_t pres_Hex;
-
+  private:
+    uint8_t _i2caddr;
+    uint8_t _pressureUnit;
+ 	uint8_t _temperatureUnit;
 };
 
 #endif
