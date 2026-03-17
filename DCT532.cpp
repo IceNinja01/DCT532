@@ -160,7 +160,7 @@ float DCT532::readTemperature() {
     buf[i] = Wire.read();
   }
 
-  return bytesToFloat(buf[3], buf[2], buf[1], buf[0]);
+  return bytesToFloat(buf[0], buf[1], buf[2], buf[3]);
 }
 
 /**************************************************************************/
