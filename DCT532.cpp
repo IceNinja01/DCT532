@@ -46,8 +46,10 @@ bool DCT532::begin(uint8_t i2caddr) {
   }
 
   // Optional: reset config to defaults (float, little-endian, etc.)
-  writeRegister(CONFIG, 0x00);
-
+  //writeRegister(CONFIG, 0x00);
+  setOutputType(true);  // 16-bit int
+  setBigEndian(false);  // or true for big endian
+  
   // Set default unit (PSI if supported)
   setPressureUnits(DCT532_PRESSURE_UNITS_PSI);
 
@@ -101,6 +103,40 @@ uint8_t DCT532::getStatus() {
 /**************************************************************************/
 bool DCT532::dataReady() {
   return (getStatus() & 0x01) != 0;
+}
+
+/**************************************************************************/
+/*!
+    @brief Set output format: 16-bit integer or 32-bit float
+    @param integerMode true = 16-bit signed int, false = float (default)
+    @return true on success (ACK received)
+*/
+/**************************************************************************/
+bool DCT532::setOutputType(bool integerMode) {
+  uint8_t cfg = readRegister(CONFIG); // 0x40
+  if (integerMode) {
+    cfg |= 0x01; // set bit 0 (TYPE=1)
+  } else {
+    cfg &= ~0x01; // clear bit 0 (TYPE=0)
+  }
+  return writeRegister(CONFIG, cfg) == 0; // assume writeRegister returns endTransmission result
+}
+
+/**************************************************************************/
+/*!
+    @brief Set byte order (endianness)
+    @param bigEndian true = high byte first, false = low byte first
+    @return true on success
+*/
+/**************************************************************************/
+bool DCT532::setBigEndian(bool bigEndian) {
+  uint8_t cfg = readRegister(CONFIG);
+  if (bigEndian) {
+    cfg |= 0x02; // set bit 1 (ORDER=1)
+  } else {
+    cfg &= ~0x02; // clear bit 1
+  }
+  return writeRegister(CONFIG, cfg) == 0;
 }
 
 /**************************************************************************/
@@ -240,4 +276,61 @@ const char* DCT532::getTemperatureUnits() {
     case 0x23: return "K";
     default: return "unknown";
   }
+}
+
+/**************************************************************************/
+/*!
+    @brief Read pressure as 16-bit signed integer (when in int16 mode)
+    Scales to your unit (e.g. bar, psi) based on nominal range
+*/
+/**************************************************************************/
+int16_t DCT532::readPressureInt16() {
+  uint8_t buf[2];
+
+  // Poll ready (same as before)
+  unsigned long start = millis();
+  while (!dataReady()) {
+    if (millis() - start > 500) return 0; // or error value
+    delay(1);
+  }
+
+  Wire.beginTransmission(_i2caddr);
+  Wire.write(PRESSURE); // 0x01
+  Wire.endTransmission(false);
+
+  Wire.requestFrom(_i2caddr, (uint8_t)2);
+  if (Wire.available() < 2) return 0;
+
+  buf[0] = Wire.read();
+  buf[1] = Wire.read();
+
+  // Assemble signed 16-bit (little-endian default)
+  int16_t val = (int16_t)((buf[1] << 8) | buf[0]); // big-endian on wire? swap to (buf[0] << 8) | buf[1]
+
+  return val;
+}
+
+/**************************************************************************/
+/*!
+    @brief Read temperature as 16-bit signed integer (when in int16 mode)
+*/
+/**************************************************************************/
+int16_t DCT532::readTemperatureInt16() {
+  uint8_t buf[2];
+
+  // same polling...
+
+  Wire.beginTransmission(_i2caddr);
+  Wire.write(0x03); // temp start in int16 mode
+  Wire.endTransmission(false);
+
+  Wire.requestFrom(_i2caddr, (uint8_t)2);
+  if (Wire.available() < 2) return 0;
+
+  buf[0] = Wire.read();
+  buf[1] = Wire.read();
+
+  int16_t val = (int16_t)((buf[1] << 8) | buf[0]); // adjust for endian if needed
+
+  return val;
 }
