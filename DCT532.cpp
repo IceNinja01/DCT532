@@ -188,7 +188,8 @@ float DCT532::bytesToFloat(uint8_t b0, uint8_t b1, uint8_t b2, uint8_t b3) {
 /**************************************************************************/
 void DCT532::setPressureUnits(dct532_pressure_unit units) {
   if(!writeRegister(PRESSUREUNIT, (uint8_t)units)){
-     Serial.println("NACK on pressure unit set!")};
+     Serial.println("NACK on pressure unit set!");
+  }
   _pressureUnit = (uint8_t)units;
 }
 
@@ -200,7 +201,8 @@ void DCT532::setPressureUnits(dct532_pressure_unit units) {
 /**************************************************************************/
 void DCT532::setTemperatureUnits(dct532_temperature_unit units) {
   if(!writeRegister(TEMPERATUREUNIT, (uint8_t)units)){
-     Serial.println("NACK on tmeperature unit set!")};
+     Serial.println("NACK on tmeperature unit set!");
+  }
   _temperatureUnit = (uint8_t)units;  //cache 
 }
 
